@@ -10,6 +10,9 @@ what tags are converted are controlled by an external configuration file.
 import optparse
 
 import gdal
+import ogr
+import osr
+
 from gdalconst import *
 
 import logging as log
@@ -21,6 +24,7 @@ parser = optparse.OptionParser(usage=usage)
 (options, args) = parser.parse_args()
 
 sourceFile = args[0]
-sourceDataSet = gdal.Open( sourceFile, GA_ReadOnly)
+sourceDataSet = ogr.Open( sourceFile, GA_ReadOnly)
 if sourceDataSet is None:
     exit
+
