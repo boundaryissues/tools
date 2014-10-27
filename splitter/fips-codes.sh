@@ -1,8 +1,11 @@
 #!/bin/sh
+#some territories have two fips code assignments, one mixed in with the
+#state fips codes which is rarely used, and one in the 60s or 70s which
+#actually appears in the Census Bureau files
 
 f_01='AL'
 f_02='AK'
-# American Samoa
+f_03='AS'
 f_04='AZ'
 f_05='AR'
 f_06='CA'
@@ -13,7 +16,7 @@ f_10='DE'
 f_11='DC'
 f_12='FL'
 f_13='GA'
-# Guam
+f_14='GU'
 f_15='HI'
 f_16='ID'
 f_17='IL'
@@ -42,7 +45,7 @@ f_39='OH'
 f_40='OK'
 f_41='OR'
 f_42='PA'
-# Puerto Rico
+f_43='PR'
 f_44='RI'
 f_45='SC'
 f_46='SD'
@@ -51,7 +54,7 @@ f_48='TX'
 f_49='UT'
 f_50='VT'
 f_51='VA'
-# Virgin Islands
+f_52='VI'
 f_53='WA'
 f_54='WV'
 f_55='WI'
