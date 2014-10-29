@@ -5,8 +5,8 @@ COUNTRY='US'
 SOURCE='US Census Bureau (TIGER)'
 SOURCEURLROOT='ftp://ftp2.census.gov/geo/tiger/TIGER'
 LICENSE='Public Domain'
-PROJECTION='WGS84'
-ORIGINALPROJECTION='NAD83'
+CRS='WGS84'
+ORIGINALCRS='NAD83'
 # State and SourceURL will be computed on the fly
 
 # load table of fips codes
@@ -36,7 +36,7 @@ echo "State: " $STATE >> METADATA
 echo "Source: " $SOURCE >> METADATA
 echo "SourceURL: " $SOURCEURL >> METADATA
 echo "License: " $LICENSE >> METADATA
-echo "Projection: " $PROJECTION >> METADATA
-echo "OriginalProjection: " $ORIGINALPROJECTION >> METADATA
+echo "CRS: " $CRS >> METADATA
+echo "OriginalCRS: " $ORIGINALCRS >> METADATA
 
 mv METADATA $1/${STATE}
