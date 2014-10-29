@@ -1,12 +1,13 @@
 #!/bin/sh
-#
 
+#
 COUNTRY='US'
 SOURCE='US Census Bureau (TIGER)'
 SOURCEURLROOT='ftp://ftp2.census.gov/geo/tiger/TIGER'
 LICENSE='Public Domain'
 CRS='WGS84'
 ORIGINALCRS='NAD83'
+
 # State and SourceURL will be computed on the fly
 
 # load table of fips codes
@@ -21,15 +22,15 @@ export YEAR=`echo tl_????_??_*.shp | sed 's/tl_\([0-9]*\).*\.shp/\1/g'`
 export FIPS=`echo tl_????_??_*.shp | sed 's/tl_[0-9]*_\(.*\)_.*.shp/\1/g'`
 export TYPE=`echo tl_????_??_*.shp | sed 's/tl_[0-9]*_.*_\(.*\).shp/\1/g'`
 
-echo $YEAR $FIPS $TYPE
+#echo $YEAR $FIPS $TYPE
 
 # get state postal code
 eval STATE=\$f_${FIPS}
 
-echo $STATE
+#echo $STATE
 
 SOURCEURL=${SOURCEURLROOT}${YEAR}/${TYPE}/tl_${YEAR}_${FIPS}_${TYPE}.zip
-echo $SOURCEURL
+#echo $SOURCEURL
 
 echo "Country: " $COUNTRY > METADATA
 echo "State: " $STATE >> METADATA
@@ -39,4 +40,4 @@ echo "License: " $LICENSE >> METADATA
 echo "CRS: " $CRS >> METADATA
 echo "OriginalCRS: " $ORIGINALCRS >> METADATA
 
-mv METADATA $1/${STATE}
+mv METADATA $1

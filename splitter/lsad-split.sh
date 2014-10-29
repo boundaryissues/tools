@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# create temp directory for shapefile reprojection
+# create temp directory for transformed shapefiles
 if [ ! -d tmp-shp ]; then
     mkdir tmp-shp
 fi
@@ -29,8 +29,8 @@ export TYPE=`echo tl_2???_??_*.shp | sed 's/tl_[0-9]*_.*_\(.*\).shp/\1/g'`
 echo "splitting"
 mapshaper tl_${YEAR}_${FIPS}_${TYPE}.shp encoding=latin1 -split LSAD 
 
-echo "reprojecting"
-# reproject split files into WGS84
+echo "transforming"
+# transform split files into WGS84
 for i in tl_${YEAR}_${FIPS}_${TYPE}-??.shp; do
     ogr2ogr -t_srs EPSG:4326  tmp-shp $i
     mv tmp-shp/* .
@@ -64,3 +64,5 @@ mv tl_${YEAR}_${FIPS}_${TYPE}-??.zip $1
 #mv split-geojson/* $1
 mv *.geojson $1
 
+# create metadata
+tiger-metadata.sh $1
