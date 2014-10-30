@@ -1,14 +1,14 @@
 #!/bin/sh
 
 #
-COUNTRY='US'
-SOURCE='US Census Bureau (TIGER)'
-SOURCEURLROOT='ftp://ftp2.census.gov/geo/tiger/TIGER'
-LICENSE='Public Domain'
-CRS='WGS84'
-ORIGINALCRS='NAD83'
+country='US'
+source='US Census Bureau (TIGER)'
+sourceurlroot='ftp://ftp2.census.gov/geo/tiger/TIGER'
+license='Public Domain'
+crs='WGS84'
+originalcrs='NAD83'
 
-# State and SourceURL will be computed on the fly
+# region and SourceURL will be computed on the fly
 
 # load table of fips codes
 . fips-codes.sh
@@ -18,26 +18,54 @@ ORIGINALCRS='NAD83'
 rm tl_????_??_*-??.???
 
 # extract year, FIPS state code and tiger file type from base shapefile name
-export YEAR=`echo tl_????_??_*.shp | sed 's/tl_\([0-9]*\).*\.shp/\1/g'`
-export FIPS=`echo tl_????_??_*.shp | sed 's/tl_[0-9]*_\(.*\)_.*.shp/\1/g'`
-export TYPE=`echo tl_????_??_*.shp | sed 's/tl_[0-9]*_.*_\(.*\).shp/\1/g'`
+year=`echo tl_????_??_*.shp | sed 's/tl_\([0-9]*\).*\.shp/\1/g'`
+fips=`echo tl_????_??_*.shp | sed 's/tl_[0-9]*_\(.*\)_.*.shp/\1/g'`
+type=`echo tl_????_??_*.shp | sed 's/tl_[0-9]*_.*_\(.*\).shp/\1/g'`
 
-#echo $YEAR $FIPS $TYPE
+echo $year $fips $type
 
-# get state postal code
-eval STATE=\$f_${FIPS}
+if ! test X"$fips" = X"us"; then
+   # get state postal code
+   eval region=\$f_${fips}
+else
+   region="us"
+fi
 
-#echo $STATE
+echo "Region:" $region
 
-SOURCEURL=${SOURCEURLROOT}${YEAR}/${TYPE}/tl_${YEAR}_${FIPS}_${TYPE}.zip
-#echo $SOURCEURL
+sourceurl=${sourceurlroot}${year}/${type}/tl_${year}_${fips}_${type}.zip
+#echo $sourceurl
 
-echo "Country: " $COUNTRY > METADATA
-echo "State: " $STATE >> METADATA
-echo "Source: " $SOURCE >> METADATA
-echo "SourceURL: " $SOURCEURL >> METADATA
-echo "License: " $LICENSE >> METADATA
-echo "CRS: " $CRS >> METADATA
-echo "OriginalCRS: " $ORIGINALCRS >> METADATA
+typestring=""
 
-mv METADATA $1
+case $type in
+
+state) typestring="States and State equivalents" ;;
+
+county) typestring="Counties and County equivalents" ;;
+
+cousub) typestring="County Subdivision" ;;
+
+place) typestring="TIGER Places (Cities & other Municipalities, CDPs)" ;;
+
+concity) typestring="Consolidated City/County Government" ;;
+
+cnecta) typestring="New England Consolidated City/Town Government" ;;
+
+esac
+
+echo "Country: " $country > METADATA
+if ! test X"$fips" = X"us"; then 
+    echo "State: " $region >> METADATA
+fi
+if ! test X"$typestring" = X""; then
+    echo "Description: " $typestring >> METADATA
+fi
+echo "Source: " $source >> METADATA
+echo "SourceURL: " $sourceurl >> METADATA
+echo "License: " $license >> METADATA
+echo "CRS: " $crs >> METADATA
+echo "OriginalCRS: " $originalcrs >> METADATA
+
+#mv METADATA $1/$region
+mv METADATA $1/
