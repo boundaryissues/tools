@@ -59,10 +59,10 @@ for f in tl_${year}_${fips}_${type}-??.shp; do
     zip tl_${year}_${fips}_${type}-${lsad}.zip tl_${year}_${fips}_${type}-${lsad}.[sdp]??
 done
 
+# create metadata
+tiger-metadata.sh $1
+
 # move zipped shapefiles and geojson files to proper destination
 mv tl_${year}_${fips}_${type}-??.zip $1
 #mv split-geojson/* $1
 mv *.geojson $1
-
-# create metadata
-tiger-metadata.sh $1
