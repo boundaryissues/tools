@@ -1,5 +1,20 @@
 #!/bin/sh
 
+destination=
+add_state="no"
+set -- `getopt d:s "$@"`
+while test $# -gt 0
+do
+    case "$1" in
+    -d)    destination="$2"; shift;;
+    -s)    add_state="yes";;
+    :*)    echo >&2 "usage: $0 [-s] [-d dir]"
+           exit 1;;
+    *)     break;;
+    esac
+    shift
+done
+
 #
 country='US'
 source='US Census Bureau (TIGER)'
@@ -8,7 +23,7 @@ sourceurlroot='ftp://ftp2.census.gov/geo/tiger/TIGER'
 license='Public Domain'
 crs='WGS84'
 originalcrs='NAD83'
-
+crsurn='urn:ogc:def:crs:OGC:1.3:CRS84'
 # region and SourceURL will be computed on the fly
 
 # load table of fips codes
@@ -72,23 +87,33 @@ for f in tl_${year}_${fips}_${type}-??.geojson; do
 done
 
 echo "{" > METADATA.json
-
-echo "    \"Country\":  \"$country\"," >> METADATA.json
+echo "    \"Location\": {" >> METADATA.json
+echo "        \"Country\":  \"$country\"," >> METADATA.json
 if ! test X"$fips" = X"us"; then 
-    echo "    \"State\":  \"$region\"," >> METADATA.json
+    echo "        \"State\":  \"$region\"," >> METADATA.json
 fi
+echo "    }," >> METADATA.json
 if ! test X"$typestring" = X""; then
     echo "    \"Description\":  \"$typestring\"," >> METADATA.json
 fi
-echo "    \"Source\":  \"$source\"," >> METADATA.json
-echo "    \"SourceURL\": \"$sourceurl\"," >> METADATA.json
-echo "    \"LSADs\":  [ $lsad_list ]," >> METADATA.json
 echo "    \"Year\":  \"$year\"," >> METADATA.json
 echo "    \"License\": \"$license\"," >> METADATA.json
-echo "    \"CRS\":  \"$crs\"," >> METADATA.json
-echo "    \"OriginalCRS\": \"$originalcrs\"" >> METADATA.json
-
+echo "    \"Source\": {" >> METADATA.json
+echo "          \"Name\": \"$source\"," >> METADATA.json
+echo "          \"SourceURL\": \"$sourceurl\"" >> METADATA.json
+echo "    }," >> METADATA.json
+echo "    \"LSADs\":  [ $lsad_list ]," >> METADATA.json
+echo "    \"CRS\": {" >> METADATA.json
+echo "        \"Name\":  \"$crs\"," >> METADATA.json
+echo "        \"URN\": \"$crsurn\"," >> METADATA.json
+echo "        \"Original\": \"$originalcrs\"" >> METADATA.json
+echo "    }" >> METADATA.json
 echo "}" >> METADATA.json
 
-#mv METADATA.json $1/$region
-mv METADATA.json $1/
+if ! test X"$destination" = X""; then
+    if test X"$add_state" = X"yes"; then
+        mv METADATA.json $destination/$region
+    else
+        mv METADATA.json $destination
+    fi
+fi
