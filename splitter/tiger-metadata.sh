@@ -29,14 +29,18 @@ crsurn='urn:ogc:def:crs:OGC:1.3:CRS84'
 # load table of fips codes
 . fips-codes.sh
 
-
-# remove old lsad specific shape files
-rm tl_????_??_*-??.???
-
 # extract year, FIPS state code and tiger file type from base shapefile name
-year=`echo tl_????_??_*.shp | sed 's/tl_\([0-9]*\).*\.shp/\1/g'`
-fips=`echo tl_????_??_*.shp | sed 's/tl_[0-9]*_\(.*\)_.*.shp/\1/g'`
-type=`echo tl_????_??_*.shp | sed 's/tl_[0-9]*_.*_\(.*\).shp/\1/g'`
+# and determine if there are lsad based splits in this directory
+
+for i in *.geojson; do
+    year=`echo $i | sed 's/tl_\([0-9]*\)_.*\.geojson/\1/g'`    
+    fips=`echo $i | sed 's/tl_[0-9]*_\([a-z0-9][a-z0-9]\)_.*.geojson/\1/g'`
+    type=`echo $i | sed 's/tl_[0-9]*_[a-z0-9]*_\([a-z]*\).*.geojson/\1/g'`
+    break
+done
+
+
+
 
 echo $year $fips $type
 
@@ -68,16 +72,24 @@ concity) typestring="Consolidated City/County Government" ;;
 
 cnecta) typestring="New England Consolidated City/Town Government" ;;
 
+aiannh) typestring="American Indian/Alaska Native/Native Hawaiian Areas" ;;
+
+aitsn) typestring="American Indian Tribal Subdivision National" ;;
+
+anrc) typestring="Alaska Native Regional Corporation" ;;
+
 esac
 
 echo $typestring
 
-lsad_list=''
-
-ls
+lsad_list=
 
 for f in tl_${year}_${fips}_${type}-??.geojson; do
+    
     lsad=`echo $f | sed 's/tl_[0-9]*_.*_.*-\(.*\).geojson/\1/g'`
+    if test X"$lsad" = X"??"; then
+	break
+    fi
     echo "processing lsad " $lsad
     if test X"$lsad_list" = X""; then
 	lsad_list=\"${lsad}\"
@@ -102,7 +114,9 @@ echo "    \"Source\": {" >> METADATA.json
 echo "          \"Name\": \"$source\"," >> METADATA.json
 echo "          \"SourceURL\": \"$sourceurl\"" >> METADATA.json
 echo "    }," >> METADATA.json
-echo "    \"LSADs\":  [ $lsad_list ]," >> METADATA.json
+if ! test X"$lsad_list" = X"" ; then
+    echo "    \"LSADs\":  [ $lsad_list ]," >> METADATA.json
+fi
 echo "    \"CRS\": {" >> METADATA.json
 echo "        \"Name\":  \"$crs\"," >> METADATA.json
 echo "        \"URN\": \"$crsurn\"," >> METADATA.json
