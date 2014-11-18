@@ -39,7 +39,7 @@ for i in *.geojson; do
     break
 done
 
-#echo $year $fips $type
+UCtype=`echo $type | tr a-z A-Z`
 
 if ! test X"$fips" = X"us"; then
    # get state postal code
@@ -50,7 +50,7 @@ fi
 
 #echo "Region:" $region
 
-sourceurl=${sourceurlroot}${year}/${type}/tl_${year}_${fips}_${type}.zip
+sourceurl=${sourceurlroot}${year}/${UCtype}/tl_${year}_${fips}_${type}.zip
 #echo $sourceurl
 
 typestring=""
