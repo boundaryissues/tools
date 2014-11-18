@@ -1,5 +1,18 @@
 #!/bin/sh
-#
+
+destination=
+set -- `getopt d "$@"`
+while test $# -gt 0
+do
+    case "$1" in
+    -d)    destination="$2"; shift;;
+    :*)    echo >&2 "usage: $0 [-s] [-d dir]"
+           exit 1;;
+    *)     break;;
+    esac
+    shift
+done
+
 # create temp directory for transformed shapefiles
 if [ ! -d tmp-shp ]; then
     mkdir tmp-shp
@@ -11,8 +24,8 @@ fi
 #fi
 
 # create destination directory for zip and geojson files
-if [ ! -d $1 ]; then
-    mkdir $1
+if [ ! -d $destination ]; then
+    mkdir $destination
 fi
 
 # remove old lsad specific shape files
@@ -59,10 +72,10 @@ for f in tl_${year}_${fips}_${type}-??.shp; do
     zip tl_${year}_${fips}_${type}-${lsad}.zip tl_${year}_${fips}_${type}-${lsad}.[sdp]??
 done
 
-# create metadata
-tiger-metadata.sh $1
-
-# move zipped shapefiles and geojson files to proper destination
-mv tl_${year}_${fips}_${type}-??.zip $1
-#mv split-geojson/* $1
-mv *.geojson $1
+if test X"$destination" = X""; then
+  tiger-metadata.sh
+else
+  tiger-metadata.sh -d $destination -s
+  mv tl_${year}_${fips}_${type}-??.zip $destination
+  mv *.geojson $destination
+fi

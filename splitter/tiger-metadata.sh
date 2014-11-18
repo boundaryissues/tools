@@ -39,10 +39,7 @@ for i in *.geojson; do
     break
 done
 
-
-
-
-echo $year $fips $type
+#echo $year $fips $type
 
 if ! test X"$fips" = X"us"; then
    # get state postal code
@@ -51,7 +48,7 @@ else
    region="us"
 fi
 
-echo "Region:" $region
+#echo "Region:" $region
 
 sourceurl=${sourceurlroot}${year}/${type}/tl_${year}_${fips}_${type}.zip
 #echo $sourceurl
@@ -80,7 +77,7 @@ anrc) typestring="Alaska Native Regional Corporation" ;;
 
 esac
 
-echo $typestring
+#echo $typestring
 
 lsad_list=
 
@@ -112,10 +109,12 @@ echo "    \"Year\":  \"$year\"," >> METADATA.json
 echo "    \"License\": \"$license\"," >> METADATA.json
 echo "    \"Source\": {" >> METADATA.json
 echo "          \"Name\": \"$source\"," >> METADATA.json
-echo "          \"SourceURL\": \"$sourceurl\"" >> METADATA.json
+echo "          \"URL\": \"$sourceurl\"" >> METADATA.json
 echo "    }," >> METADATA.json
 if ! test X"$lsad_list" = X"" ; then
-    echo "    \"LSADs\":  [ $lsad_list ]," >> METADATA.json
+    echo "    \"tiger\": {" >> METADATA.json
+    echo "        \"LSADs\":  [ $lsad_list ]," >> METADATA.json
+    echo "    }" >> METADATA.json
 fi
 echo "    \"CRS\": {" >> METADATA.json
 echo "        \"Name\":  \"$crs\"," >> METADATA.json
