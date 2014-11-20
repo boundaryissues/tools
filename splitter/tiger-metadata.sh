@@ -26,8 +26,9 @@ originalcrs='NAD83'
 crsurn='urn:ogc:def:crs:OGC:1.3:CRS84'
 # region and SourceURL will be computed on the fly
 
-# load table of fips codes
+# load tables of fips codes, lsad info
 . fips-codes.sh
+. lsad-codes.sh
 
 # extract year, FIPS state code and tiger file type from base shapefile name
 # and determine if there are lsad based splits in this directory
@@ -88,10 +89,19 @@ for f in tl_${year}_${fips}_${type}-??.geojson; do
 	break
     fi
     echo "processing lsad " $lsad
+
+    eval lsad_desc=\$ls_${lsad}_${region}_${type}
+    if test X"$lsad_desc" = X""; then
+	eval lsad_desc=\$ls_${lsad}
+    fi
+
+    lsad_entry={\"${lsad}\":\"${lsad_desc}\"}
+    echo $lsad_entry
+
     if test X"$lsad_list" = X""; then
-	lsad_list=\"${lsad}\"
+	lsad_list=${lsad_entry}
     else
-	lsad_list=${lsad_list},\"${lsad}\"
+	lsad_list=${lsad_list},${lsad_entry}
     fi
 done
 
