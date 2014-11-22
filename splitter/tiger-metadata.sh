@@ -105,6 +105,8 @@ for f in tl_${year}_${fips}_${type}-??.geojson; do
     fi
 done
 
+mv METADATA.json METADATA.old.json
+
 echo "{" > METADATA.json
 echo "    \"Location\": {" >> METADATA.json
 echo "        \"Country\":  \"$country\"," >> METADATA.json

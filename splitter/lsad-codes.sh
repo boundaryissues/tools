@@ -54,6 +54,7 @@ ls_33='Independent City (MD, MO, VA, legal, county subdivsion equivalent)'
 ls_34='Independent City (NV, legal, county subdivsion equivalent)'
 ls_35='Island (American Samoa, legal, county subdivision)'
 ls_36='Location (NH, legal, county subdivsion)'
+ls_37='Municipality (AK, PA, legal?, place)'
 ls_38='Arlington County VA (legal, county subdivision equivalent)'
 ls_39='Plantation (ME, legal, county subdivision)'
 ls_40='Territorial water areas (legal, county subdivision)'
@@ -142,19 +143,22 @@ ls_Z3='3 digit ZCTA'
 ls_Z5='5 digit ZCTA'
 
 # the second batch are the alternate mappings found in the
-# actual files
+# actual files for places
 
-ls_00_CT_place='City of Milford legal boundary'
-ls_00_GA_place='Athens, Macon & Agusta - legal boundary'
+ls_00_CT_place='City of Milford legal boundary (duplicates consolidated)'
+ls_00_GA_place='Athens, Macon & Augusta - legal boundary (boundaries for Athens and Augusta in consolidated/GA are more inclusive)'
 ls_UG_GA_place='Unified Government (City & County) - legal boundary'
-ls_00_IN_place='Indianaplis - legal boundary'
-ls_00_KS_place='Tribune/Greeley County - legal boundary - see consolidated/KS for more inclusive version'
-ls_00_KY_place='combined Louisville/Jerferson county metro boundary balance. see TIGER2014/consolidated/KY for a complete boundary'
-ls_UC_KY_place='Urban County - Legal boundary'
-ls_00_MT_place='Anaconda-Deer Lodge County & Butte-Silver Bow - combined City/County legal boundaries'
-ls_00_NJ_place='Princeton - Munincipality, combined Borough and Township'
+ls_00_IN_place='Indianaplis - legal boundary (boundary in consolidated/IN is more inclusive)'
+ls_00_KS_place='Tribune/Greeley County - legal boundary (boundary in consolidated/KS is more inclusive)'
+ls_00_KY_place='combined Louisville/Jerferson county metro boundary balance. (boundary in consolidated/KY is more inclusive)'
+ls_UC_KY_place='Lexington - Urban County - Legal boundary'
+ls_00_MT_place='Anaconda-Deer Lodge County & Butte-Silver Bow - combined City/County legal boundaries (Boundary in consolidated/MT is more inclusive for Butte-Silver Bow)'
+ls_00_NJ_place='Princeton - Municipality, combined Borough and Township'
 ls_00_NV_place='Carson City - Independent City, not contained within any County'
-ls_00_TN_place='Nashville-Davidson Metro, Hartsville/Trousdale County governments. See consolidated/TN for a more inclusive Nashville-Davidson Metro border'
+ls_00_TN_place='Nashville-Davidson Metro, Hartsville/Trousdale County governments. (Nashville boundary in consolidated/TN is more inclusive)'
+
+# the third batch are the alternate mappings found in the
+# actual files for county subdivisions
 
 ls_00_AS_cousub='Rose & Swain Islands'
 ls_00_CT_cousub='County Subdivisions not defined (offshore areas, should be 40)'
@@ -173,6 +177,6 @@ ls_00_OH_cousub='County Subdivisions not defined (offshore areas, should be 40)'
 ls_00_PA_cousub='County Subdivisions not defined (offshore areas, should be 40)'
 ls_00_PR_cousub='Muncipio Subdivisions not defined (offshore areas, should be 40)'
 ls_00_RI_cousub='County Subdivisions not defined (offshore areas, should be 40)'
-ls_00_VA_cousub='County Subdivsions not defined (Arlington - former DC)'
+ls_00_VA_cousub='County Subdivisions not defined (Arlington - former DC)'
 ls_00_VI_cousub='Island Subdivisions not defined (offshore areas, should be 40)'
 ls_00_WI_cousub='County Subdivisions not defined (offshore areas, should be 40)'
