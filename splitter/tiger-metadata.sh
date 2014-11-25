@@ -82,36 +82,30 @@ esac
 
 lsad_list=
 
+i=0
 for f in tl_${year}_${fips}_${type}-??.geojson; do
     
     lsad=`echo $f | sed 's/tl_[0-9]*_.*_.*-\(.*\).geojson/\1/g'`
     if test X"$lsad" = X"??"; then
 	break
     fi
-    echo "processing lsad " $lsad
-
-    eval lsad_desc=\$ls_${lsad}_${region}_${type}
-    if test X"$lsad_desc" = X""; then
-	eval lsad_desc=\$ls_${lsad}
-    fi
-
-    lsad_entry={\"${lsad}\":\"${lsad_desc}\"}
-    echo $lsad_entry
+#    echo "processing lsad " $lsad
 
     if test X"$lsad_list" = X""; then
-	lsad_list=${lsad_entry}
+	lsad_list=$lsad
     else
-	lsad_list=${lsad_list},${lsad_entry}
+	lsad_list="${lsad_list} ${lsad}"
     fi
+    i=`expr ${i} + 1`
 done
 
-mv METADATA.json METADATA.old.json
+rm METADATA.old.json
 
 echo "{" > METADATA.json
 echo "    \"Location\": {" >> METADATA.json
 echo "        \"Country\":  \"$country\"," >> METADATA.json
 if ! test X"$fips" = X"us"; then 
-    echo "        \"State\":  \"$region\"," >> METADATA.json
+    echo "        \"State\":  \"$region\"" >> METADATA.json
 fi
 echo "    }," >> METADATA.json
 if ! test X"$typestring" = X""; then
@@ -123,17 +117,48 @@ echo "    \"Source\": {" >> METADATA.json
 echo "          \"Name\": \"$source\"," >> METADATA.json
 echo "          \"URL\": \"$sourceurl\"" >> METADATA.json
 echo "    }," >> METADATA.json
-if ! test X"$lsad_list" = X"" ; then
+#if ! test X"$lsad_list" = X"" ; then
     echo "    \"tiger\": {" >> METADATA.json
-    echo "        \"LSADs\":  [ $lsad_list ]," >> METADATA.json
-    echo "    }" >> METADATA.json
-fi
+    echo "        \"LSADs\": ["  >> METADATA.json
+#    echo "lsad count: " ${#lsad_list[*]}
+    echo "lsad list: " $lsad_list
+    j=0
+    for lsad in $lsad_list; do
+        eval lsad_desc=\$ls_${lsad}_${region}_${type}
+        if test X"$lsad_desc" = X""; then
+	    eval lsad_desc=\$ls_${lsad}
+        fi
+	j=`expr $j + 1`
+	if [ $i -eq $j ] ; then
+	    echo "            {\"$lsad\":\"${lsad_desc}\"}" >> METADATA.json
+	else
+	    echo "            {\"$lsad\":\"${lsad_desc}\"}," >> METADATA.json
+	fi
+    done
+    echo "         ]" >> METADATA.json
+    echo "    }," >> METADATA.json
+#fi
 echo "    \"CRS\": {" >> METADATA.json
 echo "        \"Name\":  \"$crs\"," >> METADATA.json
 echo "        \"URN\": \"$crsurn\"," >> METADATA.json
 echo "        \"Original\": \"$originalcrs\"" >> METADATA.json
 echo "    }" >> METADATA.json
 echo "}" >> METADATA.json
+
+#
+
+eval state_name=\$fn_${fips}
+echo "The ${state_name} ${type} file uses the following LSAD codes:" > README
+echo '' >> README
+for lsad in $lsad_list; do
+    eval lsad_desc=\$ls_${lsad}_${region}_${type}
+    if test X"$lsad_desc" = X""; then
+        eval lsad_desc=\$ls_${lsad}
+    fi
+    echo "${lsad}  ${lsad_desc}" >> README
+done
+
+#
 
 if ! test X"$destination" = X""; then
     if test X"$add_state" = X"yes"; then
@@ -142,3 +167,4 @@ if ! test X"$destination" = X""; then
         mv METADATA.json $destination
     fi
 fi
+
