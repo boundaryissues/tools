@@ -13,18 +13,18 @@ for root, dirs, files in os.walk( "."):
         if name == 'METADATA.json':
 # filter metadata file?
 # load metadata file
-            print( os.path.join( root, name))
+#            print( os.path.join( root, name))
             print( root, name)
             inputFile = open( os.path.join( root, name), "rb")
             result = json.load( inputFile)
 
 #     build index data structure
 
-            entry = {'metadata' : name}
-            index_entry = {'state' : result['Location']['State']}
-            entry['indexes'] = [ index_entry]
+            if not 'State' in result['Location'] :
+                continue
 
             files = {}
+            entry = {}
             candidate_files = os.listdir( root)
             for f in candidate_files:
                 if f.endswith( ".geojson") or f.endswith( ".zip"):
@@ -41,12 +41,17 @@ for root, dirs, files in os.walk( "."):
                     if typ == 'geojson' :
                         embed = "https://embed.github.com/view/geojson"
                         embed = embed + "/openpolygons/TIGER2014/master/"
-                        # need to add type
-                        embed = embed + "typegoeshere/"
+                        type2 = root.partition("/")
+                        type3 = type2[2].partition( "/")
+                        embed = embed + type3[0] + "/"
                         embed = embed + f
                         files[fileroot].append( {'embed' : embed})
 
+            entry['prefix'] = "prefix for fetching from git goes here"
             entry['files'] = files
+            entry['metadata'] = name
+            index_entry = {'state' : result['Location']['State']}
+            entry['indexes'] = [ index_entry]
 
             index.append( entry)
 
