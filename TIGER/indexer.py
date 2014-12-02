@@ -39,7 +39,12 @@ for root, dirs, files in os.walk( "."):
                     else :
                         files[fileroot] = [typ]
                     if typ == 'geojson' :
-                        files[fileroot].append( {'geojsonembed' : 'geojson embed goes here'})
+                        embed = "https://embed.github.com/view/geojson"
+                        embed = embed + "/openpolygons/TIGER2014/master/"
+                        # need to add type
+                        embed = embed + "typegoeshere/"
+                        embed = embed + f
+                        files[fileroot].append( {'embed' : embed})
 
             entry['files'] = files
 
