@@ -1,11 +1,13 @@
 #!/bin/sh
 
-destination=
-set -- `getopt d "$@"`
+add_state="no"
+destination=""
+set -- `getopt d:s "$@"`
 while test $# -gt 0
 do
     case "$1" in
     -d)    destination="$2"; shift;;
+    -s)    add_state="yes";;
     :*)    echo >&2 "usage: $0 [-s] [-d dir]"
            exit 1;;
     *)     break;;
@@ -32,7 +34,7 @@ fi
 rm tl_????_??_*-??.???
 
 # extract fips state code and tiger file type from base shapefile name
-year=`echo tl_20??_??_*.shp | sed 's/tl_\([0-9]*\).*\.shp/\1/g'`
+year=`echo tl_2???_??_*.shp | sed 's/tl_\([0-9]*\).*\.shp/\1/g'`
 fips=`echo tl_2???_??_*.shp | sed 's/tl_[0-9]*_\(.*\)_.*.shp/\1/g'`
 type=`echo tl_2???_??_*.shp | sed 's/tl_[0-9]*_.*_\(.*\).shp/\1/g'`
 
@@ -72,10 +74,20 @@ for f in tl_${year}_${fips}_${type}-??.shp; do
     zip tl_${year}_${fips}_${type}-${lsad}.zip tl_${year}_${fips}_${type}-${lsad}.[sdp]??
 done
 
+echo "Destination: " $destination
+
 if test X"$destination" = X""; then
   tiger-metadata.sh
 else
-  tiger-metadata.sh -d $destination -s
-  mv tl_${year}_${fips}_${type}-??.zip $destination
-  mv *.geojson $destination
+  if test X"$add_state" = X"yes"; then
+      . fips-codes.sh
+      eval state=\$f_${fips}
+      tiger-metadata.sh -d $destination -s
+      mv tl_${year}_${fips}_${type}-??.zip $destination/$state
+      mv *.geojson $destination/$state
+  else
+      tiger-metadata.sh -d $destination
+      mv tl_${year}_${fips}_${type}-??.zip $destination
+      mv *.geojson $destination
+  fi
 fi
