@@ -56,9 +56,9 @@ for i in tl_${year}_us_${type}-??.shp; do
     zip tl_${year}_us_${type}-${fips}.zip tl_${year}_us_${type}-${fips}.[sdp]??
     ogr2ogr -f "GeoJSON" tl_${year}_us_${type}-${fips}.geojson tl_${year}_us_${type}-${fips}.shp
     if test X"$destination" = X""; then
-      tiger-metadata.sh -n
+      tiger-metadata-state.sh -n
     else
-      tiger-metadata.sh -d $destination/$state -e $state -n
+      tiger-metadata-state.sh -d $destination/$state -e $state -n
       mv tl_${year}_us_${type}-??.zip $destination/$state
       mv *.geojson $destination/$state
     fi

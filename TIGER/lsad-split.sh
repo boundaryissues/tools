@@ -77,7 +77,7 @@ done
 echo "Destination: " $destination
 
 if test X"$destination" = X""; then
-  tiger-metadata.sh
+  tiger-metadata-state.sh
 else
   if test X"$add_state" = X"yes"; then
       . fips-codes.sh

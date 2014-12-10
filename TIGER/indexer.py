@@ -14,7 +14,7 @@ for root, dirs, files in os.walk( "."):
 # filter metadata file?
 # load metadata file
 #            print( os.path.join( root, name))
-            print( root, name)
+#            print( root, name)
             inputFile = open( os.path.join( root, name), "rb")
             result = json.load( inputFile)
 
@@ -55,6 +55,6 @@ for root, dirs, files in os.walk( "."):
 
             index.append( entry)
 
-# write out index in appropriate place in front end repository
+# write out index to stdout for now
 
 print json.dumps( index, indent=4, separators=(',',':'))
