@@ -82,11 +82,11 @@ else
   if test X"$add_state" = X"yes"; then
       . fips-codes.sh
       eval state=\$f_${fips}
-      tiger-metadata.sh -d $destination -s
+      tiger-metadata-state.sh -d $destination -s
       mv tl_${year}_${fips}_${type}-??.zip $destination/$state
       mv *.geojson $destination/$state
   else
-      tiger-metadata.sh -d $destination
+      tiger-metadata-state.sh -d $destination
       mv tl_${year}_${fips}_${type}-??.zip $destination
       mv *.geojson $destination
   fi

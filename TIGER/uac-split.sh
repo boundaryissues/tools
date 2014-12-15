@@ -24,13 +24,9 @@ root_name=tl_2014_us_uac10
 #
 sort -r -n --key=3 --field-separator=: ua_list_all.csv > /tmp/sorted-ua-list
 
-#sort -r -n --key=3 --field-separator=: ua_list_all.csv  |  head -n 200 | tail -n 100 | cut -d : -f 1 > 101-200
-
 query_prefix="UACE10 IN "
-#query_prefix="SELECT * FROM ${root_name} WHERE UACE10 IN "
-#echo "$query_prefix"
 
-block_start=101
+block_start=1
 last_block_start=3601
 lines=`wc -l < /tmp/sorted-ua-list`
 num_entries=100
@@ -83,7 +79,10 @@ while [ $block_start -le $last_block_start ]; do
     cd ..
 
     # move if destination is set
-    if ! [ X"$destination" = X"" ]; then
+    if [ X"$destination" = X"" ]; then
+	tiger-metadata-other.sh
+    else
+	tiger-metadata-other.sh -d $destination/${start_end}
 	mkdir ${destination}/${start_end}
 	mv ${new_name}.zip ${new_name}.geojson $destination/${start_end}
     fi
