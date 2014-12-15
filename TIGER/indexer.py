@@ -18,6 +18,9 @@ embed_middle = '/master/'
 def get_type (string):
     return string.partition("/")[2].partition("/")[0]
 
+def get_range( string):
+    return string.partition("-")[2].partition(".")[0]
+
 # traverse repository, find METADATA.json files
 
 index = []
@@ -39,6 +42,7 @@ for root, dirs, files in os.walk( "."):
                 state = result['Location']['State']
             else :
                 state = None
+            tiger_type = get_type( root)
             candidate_files = os.listdir( root)
             for f in candidate_files:
                 if f.endswith( ".geojson") or f.endswith( ".zip"):
@@ -54,13 +58,15 @@ for root, dirs, files in os.walk( "."):
                         files[fileroot] = [typ]
                     if typ == 'geojson' :
                         embed = embed_prefix + tiger_version + embed_middle
-                        embed = embed + get_type( root) + "/"
+                        embed = embed + tiger_type + "/"
                         if not state is None :
                             embed = embed + state + "/"
+                        if tiger_type == 'uac':
+                            embed = embed + get_range( f) + "/"
                         embed = embed + f
                         files[fileroot].append( {'embed' : embed})
 
-            url = full_url_prefix + get_type( root) + "/"
+            url = full_url_prefix + tiger_type + "/"
             if not state is None :
                 url = url + state + "/"
             entry['prefix'] = url
