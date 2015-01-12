@@ -7,13 +7,13 @@ import json
 tiger_version = '2014'
 
 
-url_prefix = 'https://github.com/boundaryissues/TIGER'
-url_middle = '/tree/master/'
+data_url_prefix = 'https://github.com/boundaryissues/TIGER'
+data_url_middle = '/tree/master/'
 
-full_url_prefix = url_prefix + tiger_version + url_middle
+full_data_url_prefix = data_url_prefix + tiger_version + data_url_middle
 
-embed_prefix = "https://embed.github.com/view/geojson/boundaryissues/TIGER"
-embed_middle = '/master/'
+#embed_prefix = "https://embed.github.com/view/geojson/boundaryissues/TIGER"
+#embed_middle = '/master/'
 
 def get_type (string):
     return string.partition("/")[2].partition("/")[0]
@@ -23,7 +23,14 @@ def get_range( string):
 
 # traverse repository, find METADATA.json files
 
-index = []
+collection = {}
+filelist = []
+index = {'collection' : collection, 'files' : filelist}
+
+collection['metadataURL'] = full_data_url_prefix
+collection['dataURL'] = full_data_url_prefix
+collection['name'] = 'TIGER' + tiger_version
+collection['indexes'] = {'country' : 'US'}
 
 for root, dirs, files in os.walk( "."):
     for name in files:
@@ -31,19 +38,25 @@ for root, dirs, files in os.walk( "."):
 # filter metadata file?
 # load metadata file
 
+            tiger_type = get_type( root)
+
+            if tiger_type == '':
+                break
+
             inputFile = open( os.path.join( root, name), "rb")
             result = json.load( inputFile)
 
 #     build index data structure
 
-            files = {}
             entry = {}
             if 'State' in result['Location'] :
                 state = result['Location']['State']
             else :
                 state = None
-            tiger_type = get_type( root)
             candidate_files = os.listdir( root)
+            fileroot = ''
+            index_entry = {}
+            file_type_list = []
             for f in candidate_files:
                 if f.endswith( ".geojson") or f.endswith( ".zip"):
                     partz = f.rpartition( ".")
@@ -51,34 +64,23 @@ for root, dirs, files in os.walk( "."):
                     if partz[2] == 'geojson':
                         typ = 'geojson'
                     elif partz[2] == 'zip':
-                        typ = 'shapefile'
-                    if fileroot in files :
-                        files[fileroot].append( typ)
+                        typ = 'zipped_shapefile'
+                    file_type_list.append( typ)
+                    if state is None :
+                        index_entry = {'country' : 'US'}
                     else :
-                        files[fileroot] = [typ]
-                    if typ == 'geojson' :
-                        embed = embed_prefix + tiger_version + embed_middle
-                        embed = embed + tiger_type + "/"
-                        if not state is None :
-                            embed = embed + state + "/"
-                        if tiger_type == 'uac':
-                            embed = embed + get_range( f) + "/"
-                        embed = embed + f
-                        files[fileroot].append( {'embed' : embed})
+                        index_entry = {'country' : 'US', 'states' : [ result['Location']['State'] ]}
+            entry['name'] = fileroot
+            entry['types'] = file_type_list
+            entry['indexes'] = index_entry
+            subdir = tiger_type
+            if tiger_type == 'county' or tiger_type == 'place' or tiger_type == 'cousub':
+                subdir = subdir + '/' + state
+            elif tiger_type == 'uac':
+                subdir = subdir + '/' + get_range( f)
+            entry['subdir'] = subdir
 
-            url = full_url_prefix + tiger_type + "/"
-            if not state is None :
-                url = url + state + "/"
-            entry['prefix'] = url
-            entry['files'] = files
-            entry['metadata'] = name
-            if state is None :
-                index_entry = {'country' : 'US'}
-            else :
-                index_entry = {'country' : 'US', 'state' : result['Location']['State']}
-            entry['indexes'] = [ index_entry]
-
-            index.append( entry)
+            filelist.append( entry)
 
 # write out index to stdout for now
 
