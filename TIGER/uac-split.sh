@@ -3,6 +3,11 @@
 # produces: top25 file
 #           files for blocks of 100 starting with 1, e.g. 1-100, 101-200, ...
 
+# jq query to extract UACE10 fields from properties in geojson and return
+# as an array
+# jq '[.features|.[]|.properties|.UACE10]'
+
+
 destination=""
 set -- `getopt d:s "$@"`
 while test $# -gt 0
@@ -41,25 +46,29 @@ while [ $block_start -le $last_block_start ]; do
 	num_entries=`expr ${lines} - ${block_start}`
     fi
 #    echo $block_start $num_entries
-    tail -n +${block_start} /tmp/sorted-ua-list | head -n ${num_entries} | cut -d : -f 1 > /tmp/${block_start}
+    tail -n +${block_start} /tmp/sorted-ua-list | head -n ${num_entries} | cut -d : -f 1,2 > /tmp/${block_start}
 
     #process list
 
     id_list=""
+    state_list=""
     while read line
     do
-#	echo $line
+	states=`echo $line | cut -d : -f 2 | cut -d , -f 2 | separate-states.awk`
+	id=`echo $line | cut -d : -f 1`
 	if test X"$id_list" = X""; then
-	    id_list=\'$line\'
+	    id_list=\'$id\'
+	    state_list=$states
 	else
-	    id_list=$id_list,\'$line\'
+	    id_list=$id_list,\'$id\'
+	    state_list=$state_list,$states
 	fi
     done < "/tmp/${block_start}"
 
     block_end=`expr ${block_start} + ${num_entries} - 1`
 
     query="${query_prefix} (${id_list})"
-    echo "$query"
+#    echo "$query"
 
     ogr2ogr -t_srs EPSG:4326 -where "$query" tmp-shp ${root_name}.shp
 
@@ -80,9 +89,9 @@ while [ $block_start -le $last_block_start ]; do
 
     # move if destination is set
     if [ X"$destination" = X"" ]; then
-	tiger-metadata-other.sh
+	tiger-metadata-other.sh -s $state_list
     else
-	tiger-metadata-other.sh -d $destination/${start_end}
+	tiger-metadata-other.sh -d $destination/${start_end} -s $state_list
 	mkdir ${destination}/${start_end}
 	mv ${new_name}.zip ${new_name}.geojson $destination/${start_end}
     fi

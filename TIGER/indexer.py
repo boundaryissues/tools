@@ -51,8 +51,13 @@ for root, dirs, files in os.walk( "."):
             entry = {}
             if 'State' in result['Location'] :
                 state = result['Location']['State']
+                states = None
+            elif 'States' in result['Location'] :
+                state = None
+                states = result['Location']['States']
             else :
                 state = None
+                states = None
             candidate_files = os.listdir( root)
             fileroot = ''
             index_entry = {}
@@ -67,9 +72,12 @@ for root, dirs, files in os.walk( "."):
                         typ = 'zipped_shapefile'
                     file_type_list.append( typ)
                     if state is None :
-                        index_entry = {'country' : 'US'}
+                        if states is None :
+                            index_entry = {'country' : 'US'}
+                        else :
+                            index_entry = {'country' : 'US', 'states' : states}
                     else :
-                        index_entry = {'country' : 'US', 'states' : [ result['Location']['State'] ]}
+                        index_entry = {'country' : 'US', 'states' : [ state]}
             entry['name'] = fileroot
             entry['types'] = file_type_list
             entry['indexes'] = index_entry
